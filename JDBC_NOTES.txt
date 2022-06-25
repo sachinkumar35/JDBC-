@@ -1,0 +1,518 @@
+#1	
+	JDBC - Java Database Connectivity
+		
+	JDBC stands for Java Database Connectivity. it is a standard API provided by Oracle for java applications to interact with different set of database
+	JDBC is a Java API to connect and execute the query with the database. It is a part of JavaSE (Java Standard Edition). JDBC API uses JDBC drivers to connect with the database. There are four types of JDBC drivers:
+	
+	. JDBC-ODBC Bridge Driver,
+	. Native Driver,
+	. Network Protocol Driver, and
+	. Thin Driver
+	
+  How JDBC Work(Architecture of JDBC)
+  
+		JDBC Application Layer										JDBC Driver Layer
+	Java Application ----> JDBC API      ---->       JDBC Database Driver (Oracle, sql, mariadb drivers) ----> Database(Oracle, sql, mariadb)
+	Java Application <---- JDBC API      <----       JDBC Database Driver (Oracle, sql, mariadb drivers) <---- Database(Oracle, sql, mariadb)
+
+
+Where to write code:
+	. Any TextEditor such as Notepad, sublime, vscode etc.
+	. Any java IDE Netbeans, Eclipse, IntelliJ
+	
+*****************************************************************************************************************************
+#2
+
+Needable Software:
+	. Java
+	. Database : Oracle, MySql DB etc
+		we are going to install MySql
+	. JDBC Driver : MySql-Connector.jar: 8.0
+	. Notepad, Notepad++, Sublime etc.
+	
+	
+Download MySql:
+	Link: https://dev.mysql.com/downloads/installer/     and install step by step by your own;
+Download JDBC Driver: 
+	Link: https://dev.mysql.com/downloads/connector/j/ 
+	> Set ClassPath:
+		copy the driver path: open that zip file which you downloaded then copy the path of that driver
+		Open advanced system setting/ environment/ open classPath and new and pasete/ if class Path is not ther then click on new and title: classpath then paste path after the path writhe ;.; (semi collon dot semi collon)
+		
+		
+*******************************************************************************************************************************
+#3
+
+1) Load the driver:
+		> Class.forName("Driver_name");  // Class.forName("com.mysql.jdbc.Driver") 
+			(or)
+		> DriverManager.registerDriver(new com.mysql.jdbc.Driver());
+		
+2) Create a Connection:
+		Connection con = DriverManager.getConnection("url(jdbc:mysql://localhost:3306/dbname)","username","password");
+		// con is a connection type variable we can say object which is storing connection
+		
+3) Create a query, Statement, PreparedStatement, CallableStatement;
+		eg:
+			String q= "select * from students"; // we have a query and we have to fire this query that is stored in string type variable 'q'
+			
+			Statement stmt= con.createStatement(); // now we have to find object of statement and that object given by connection
+			
+		// now we have to fire query with the help of stmt
+				we have 3 mathods
+			ResultSet set = stmt.executeQuery(q); // we use this if we are expect data is comming
+			int update = stmt.executeUpdate(q); // 
+			stmt.executeSimply(q);
+			
+			
+4) Process the data:
+		While(set.next()) // next will reach to the next row if it is there then fatch the data of next row
+		{
+			int id = set.getInt(column_number (or) studentID(name of the column) ); // here we are fatching the data (ID) of column
+			String name = set.getString("studentName"); // here we are fatching name column
+			System.out.println(id);
+			System.out.pringln(name);
+		} 
+			
+
+5) Close the connection:
+		con.close();
+		
+****************************************************************************************************************************
+#4
+
+// Program for jdbc 1 program:
+
+package jdbcPack;
+
+import java.sql.Connection;
+import java.sql.DriverManager;
+
+public class FirstJDBC {
+	public static void main(String[] args) {
+		try
+		{
+			//load the driver:  (add jar file in build path (library) )
+			Class.forName("com.mysql.jdbc.Driver");
+			
+			// creating a connection
+			String url = "jdbc:mysql://localhost:3306/practice";// here practice is a database we created before if i want and change and any update i'll do in this database;
+			String username = "root";
+			String password = "proot";
+			
+			Connection con = DriverManager.getConnection(url,username,password);
+			
+	// to check database connected or not
+			if(con.isClosed()) System.out.println("Connection is Closed");
+			else System.out.println("Connection is Created......!");
+		
+		}catch(Exception e) {
+			e.printStackTrace();
+		}
+	}
+}
+
+*********************************************************************************************************************
+#5
+NOW CREATE A TABLE:
+
+public class InsertJDBC {
+	public static void main(String[] args) {
+		try {
+			//load the driver:  (add jar file in build path (library) )
+			Clzass.forName("com.mysql.cj.jdbc.Driver");
+			
+			// creating a connection
+			String url = "jdbc:mysql://localhost:3306/practice";// here practice is a database we created before if i want and change and any update i'll do in this database;
+			String username = "root";
+			String password = "proot";
+			
+			Connection con = DriverManager.getConnection(url,username,password);
+			
+			String q = "create table table1(tId int(20) primary key auto_increment, tName varchar(200) not null, tCity varchar(400))";
+			
+			//create a Statement:
+			Statement stmt = con.createStatement();
+			
+			stmt.executeUpdate(q);
+			System.out.println("table created in database..!");
+			
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+}
+
+****************************************************************************************************************************
+#6
+
+ INSERT DATA INTO TABLE USING PREPARED_STATEMENT 
+ 
+ // we use PreparedStatement for Dynamic queries or Parameterized queries 
+			>( that mean's if our query is accepting any parameter or any '?' so that query is known as dynamic query) 
+			> and instead of this '?' we can give the values at a run time. ( if we don't know query then we give '?' to give query at runtime;
+			
+ PROGRAM
+ 
+ public class Insert_by_PreparedStatement {
+
+	public static void main(String[] args) {
+		
+		try {
+			
+			Class.forName("com.mysql.cj.jdbc.Driver");
+			
+			// creating a connection
+			String url = "jdbc:mysql://localhost:3306/practice";// here practice is a database we created before if i want and change and any update i'll do in this database;
+			String username = "root";
+			String password = "proot";
+			
+			Connection con = DriverManager.getConnection(url,username,password);
+			
+//	CREATE A QUERY
+			String q="insert into table1(tName,tCity) values (?,?)";
+//	get the PreparedStatement object
+			PreparedStatement pstmt = con.prepareStatement(q);
+//	Set the values to query
+			pstmt.setString(1, "sachin bhardwaj");
+			pstmt.setString(2, "Mathura");
+			
+			pstmt.executeUpdate();
+			
+//		message
+			System.out.println("Inserted...");
+			
+			con.close();
+				
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+}
+
+*************************************************************************************************************************
+#7
+
+ Earlier we gave the values manually but now we will give by automation 
+ now we want when our program run that time ask value like a query to us and we'll be giving the value at run time
+
+PROGRAM:
+
+ package jdbcPack;
+
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+
+public class Insert_Dynamically_PreparedStatement {
+public static void main(String[] args) {
+		
+		try {
+			
+			Class.forName("com.mysql.cj.jdbc.Driver");
+			
+			// creating a connection
+			String url = "jdbc:mysql://localhost:3306/practice";// here practice is a database we created before if i want and change and any update i'll do in this database;
+			String username = "root";
+			String password = "proot";
+			
+			Connection con = DriverManager.getConnection(url,username,password);
+			
+//	CREATE A QUERY
+			String q="insert into table1(tName,tCity) values (?,?)";
+//	get the PreparedStatement object
+			PreparedStatement pstmt = con.prepareStatement(q);
+			
+//	Here we will use BufferedReader (BufferedReader is similar to Scanner (to take value by keyboard)
+			BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+			System.out.println("Enter Name : ");
+			String name = br.readLine();
+			
+			System.out.println("Enter City : ");
+			String city = br.readLine();
+			
+//	Set the values to query
+			pstmt.setString(1,name );
+			pstmt.setString(2,city);
+			
+			pstmt.executeUpdate();
+			
+//		message
+			System.out.println("Inserted...");
+			
+			con.close();
+				
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+}
+
+**************************************************************************************************************************
+#8 			
+
+INSERTING IMAGE TO DATABASE USING JAVA(JAVA DATABASE CONNECTIVITY) JDBC;
+
+PROGRAM:
+
+>>>
+
+package jdbcPack;
+
+import java.io.FileInputStream;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+
+public class Insert_Images_in_DB {
+	public static void main(String[] args) {
+		try {
+			
+			Class.forName("com.mysql.cj.jdbc.Driver");
+			
+//	create connection		
+			Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/practice","root","proot");
+
+//	Query for insert		
+			String q = "insert into images(pic) values(?)";
+			
+			PreparedStatement pstmt = con.prepareStatement(q);
+			
+//	to read file we made file object of fileInputStream ( it will fatch the file from machine )		
+			FileInputStream file = new FileInputStream("J:\\JDBC\\pict.jpg");
+//	here we set the file in database so 1 is first '?' and file and file.available will return how many bites are available  		
+			pstmt.setBinaryStream(1, file, file.available());
+			
+			pstmt.executeUpdate();
+			
+			System.out.println("Done....");
+			
+		} catch (Exception e) {
+			System.out.println("Error !!");
+			e.printStackTrace();
+		}
+	}
+}
+
+******************************************************************************************************************************
+#9
+
+Here we have to insert big image in database
+	 we have inserted small image in database with the using blob
+	 there are three data type to insert image
+	   this blob we use when we create record in database ( blob is a Type for image like (int,float,char)) 
+		1.blob = small size
+		2.mediumblob= medium size
+		3.longblob = big size
+
+
+PROGRAM:...
+
+
+package jdbcPack;
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+
+import javax.swing.JFileChooser;
+import javax.swing.JOptionPane;
+
+public class Insert_BigImage_in_DB {
+
+	public static void main(String[] args) {
+		try {
+			
+//	Here we are calling the "Connection Provider of method 'getConnection' " which we have created to make Connection		
+			Connection c = ConnectionProvider.getConnection();
+			
+//  query for insert big image as we know we have created the variable and all in database here we have to give the value only 
+//	  >> here we are inserting into image pic = value(?) this ? will take a value 	
+			String q = "insert into images(pic) value(?)";
+		
+//	creating preparedStatement 
+			PreparedStatement pstmt = c.prepareStatement(q);
+			
+//	Here we have to set the value of '?' like earlier we done  >>> but now we want to choose the image at a run time by dialog Box 
+			JFileChooser jfc = new JFileChooser();
+			
+			jfc.showOpenDialog(null);
+			
+			File file = jfc.getSelectedFile();
+			
+			FileInputStream fis = new FileInputStream(file);
+			
+			pstmt.setBinaryStream(1, fis, fis.available());
+			
+			pstmt.executeUpdate();
+			
+//			System.out.println("Done ....!!");
+			
+//	if we want to show message in GUI form
+			JOptionPane.showMessageDialog(null, "success");
+			
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+	}
+
+}
+
+--------------------------------------------------------------------------------------------------------------------------------
+
+	HERE WE HAVE CREATED A CLASS WHICH IS 'CONNECTION PROVIDER' TO CREATE Connection
+	AND SYMPLY WE ARE CALLING THIS CLASS IN PROGRAM 
+
+						package jdbcPack;
+
+						import java.sql.Connection;
+						import java.sql.DriverManager;
+
+						public class ConnectionProvider {
+							// creating private connection variable con;
+								private static Connection con;
+								
+							// creating a Connection Method to write the code to make connection
+								public static Connection getConnection() {
+									
+									try {
+									if(con==null) {
+										Class.forName("com.mysql.cj.jdbc.Driver");
+										
+							//	create connection		
+										con = DriverManager.getConnection("jdbc:mysql://localhost:3306/practice","root","proot");
+
+									} 
+									
+									}catch(Exception e) {
+										e.printStackTrace();
+									}
+									
+									return con;
+								}	
+							}
+
+-------------------------------------------------------------------------------------------------------------------------------------------
+
+**************************************************************************************************************************************
+#10
+
+UPDATING DATA OF TABLE IN DATABASE
+
+ PROGRAM -:
+
+package jdbcPack;
+
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.util.Scanner;
+
+public class Update_Data_OfTable_in_DB {
+
+	public static void main(String[] args) {
+		
+		try {
+			
+			Connection con = ConnectionProvider.getConnection();
+			
+//	Query to Update data of table in database
+			String q = "update table1 set tName=?, tCity=? where tId=?";
+			
+//			BufferedReader br = new BufferedReader (new InputStreamReader(System.in));
+//			
+//			System.out.println("Enter new Name : ");
+//			String name = br.readLine();
+//			
+//			System.out.println("Enter new City : ");
+//			String city = br.readLine();
+//			
+//			System.out.println("Enter Student ID : ");
+//			int id = Integer.parseInt(br.readLine());
+			
+			Scanner sc = new Scanner(System.in);
+			
+			System.out.println("Enter new Name : ");
+			String name = sc.nextLine();
+			
+			System.out.println("Enter new City : ");
+			String city = sc.nextLine();
+			
+			System.out.println("Enter Student ID : ");
+			int id = sc.nextInt();
+			
+			PreparedStatement pstmt = con.prepareStatement(q);
+			pstmt.setString(1, name);
+			pstmt.setString(2, city);
+			
+			pstmt.setInt(3, id);
+			
+			pstmt.executeUpdate();
+			
+			System.out.println("Done.......!!");
+			
+			con.close();
+			
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+}
+
+
+**************************************************************************************************************************
+#11
+
+SELECTING DATA USING JAVA APP:
+ 
+ PROGRAM -:
+ 
+ package jdbcPack;
+
+import java.sql.Connection;
+import java.sql.ResultSet;
+import java.sql.Statement;
+
+public class Selecting_Data_Using_JavaApp {
+
+	public static void main(String[] args) {
+		
+		try {
+			
+			Connection con = ConnectionProvider.getConnection();
+			
+//		Query for Selecting data	
+			String q = "select * from table1";
+			
+			Statement stmt = con.createStatement();
+			ResultSet set = stmt.executeQuery(q);
+			
+			while(set.next()) // this while loop return true or false -> if there is next row then it will return true else false
+			{
+				int id = set.getInt(1);
+				String name = set.getString(2);
+				String city = set.getString(3);
+				
+				System.out.println(name+ " : " + city + " : "+ id);
+			}
+			
+			con.close();
+				
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+}
+
+
+*********************************************************************************************************************
+#12
+
+HERE WE ARE DISPLAYING IMAGE FROM DATABASE ON SCREEN USING SWING BECAUSE ON CONSOL WE CAN'T SEE IMAGE 
+
+
+
+
