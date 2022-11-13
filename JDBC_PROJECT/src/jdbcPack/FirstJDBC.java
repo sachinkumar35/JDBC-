@@ -7,7 +7,7 @@ import java.sql.DriverManager;
 public class FirstJDBC {
 	public static void main(String[] args) {
 		try
-		{
+		{ 
 			//load the driver:  (add jar file in build path (library) )
 			Class.forName("com.mysql.jdbc.Driver");
 			
